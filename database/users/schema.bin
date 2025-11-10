@@ -1,4 +1,0 @@
-table: users
-created: 2025-11-10T20:55:33.377474200
-engine: MergeTree
-order_by: [id]
