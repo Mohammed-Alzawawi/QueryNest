@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+parser:
+  supported-data-types:
+    - VARCHAR
+    - INTEGER
+    - BIGINT
+    - BOOLEAN
+    - DATE
+    - TIMESTAMP
+    - DECIMAL
+    - TEXT
+  max-table-name-length: 64
+  max-column-name-length: 64
+
+database:
+  storage:
+    path: ./database
