@@ -38,4 +38,8 @@ public class SchemaRegistry {
     public void clear() {
         tables.clear();
     }
+
+    public void dropTable(String tableName) {
+        tables.remove(tableName.toLowerCase());
+    }
 }
