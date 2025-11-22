@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 @Component
@@ -26,49 +27,72 @@ public class JsonTableSchemaSerializer implements TableSchemaSerializer {
     }
 
     @Override
-    public void serialize(CreateTableStatement statement, Path tableDir) throws IOException {
+    public void serialize(CreateTableStatement statement, Path tableDir,  String uuid) throws IOException {
         Files.createDirectories(tableDir);
         Path schemaFile = tableDir.resolve("schema.json");
 
         Map<String, Object> root = new LinkedHashMap<>();
-        root.put("tableName", statement.tableName());
-        root.put("orderBy", statement.orderBy());
+        root.put("version", 1);
+
+        Map<String, Object> tableInfo = new LinkedHashMap<>();
+        tableInfo.put("name", statement.tableName().toLowerCase());
+        tableInfo.put("engine", "FileSystem");
+        tableInfo.put("orderBy", statement.orderBy());
+        tableInfo.put("uuid", uuid);
+        root.put("table", tableInfo);
 
         List<Map<String, Object>> columns = new ArrayList<>();
         for (ColumnDefinition col : statement.columns()) {
             Map<String, Object> c = new LinkedHashMap<>();
             c.put("name", col.name());
-            c.put("dataType", col.dataType());
+
+            Map<String, Object> typeObj = new LinkedHashMap<>();
+            typeObj.put("name", col.dataType());
+            c.put("type", typeObj);
+
             c.put("nullable", col.isNullable());
-            c.put("defaultValue", col.defaultValue());
+            c.put("default", col.defaultValue());
+
             columns.add(c);
         }
         root.put("columns", columns);
 
-        List<Map<String, Object>> constraints = new ArrayList<>();
+        Map<String, Object> constraints = new LinkedHashMap<>();
+
+        List<String> pk = new ArrayList<>();
+        List<List<String>> uniques = new ArrayList<>();
+        List<Map<String, Object>> fks = new ArrayList<>();
+
         for (Constraint constraint : statement.constraints()) {
-            Map<String, Object> c = new LinkedHashMap<>();
-            c.put("name", constraint.name());
 
-            if (constraint instanceof PrimaryKeyConstraint pk) {
-                c.put("type", "PRIMARY_KEY");
-                c.put("columns", pk.columnNames());
+            if (constraint instanceof PrimaryKeyConstraint pkc) {
+                pk.addAll(pkc.columnNames());
+
             } else if (constraint instanceof UniqueConstraint uq) {
-                c.put("type", "UNIQUE");
-                c.put("columns", uq.columnNames());
-            } else if (constraint instanceof ForeignKeyConstraint fk) {
-                c.put("type", "FOREIGN_KEY");
-                c.put("columns", fk.columnNames());
-                c.put("referencedTable", fk.referencedTable());
-                c.put("referencedColumns", fk.referencedColumns());
-            } else {
-                c.put("type", "UNKNOWN");
-            }
+                uniques.add(uq.columnNames());
 
-            constraints.add(c);
+            } else if (constraint instanceof ForeignKeyConstraint fk) {
+                Map<String, Object> fkObj = new LinkedHashMap<>();
+                fkObj.put("columns", fk.columnNames());
+                fkObj.put("referencedTable", fk.referencedTable());
+                fkObj.put("referencedColumns", fk.referencedColumns());
+                fks.add(fkObj);
+            }
         }
+
+        constraints.put("primaryKey", pk);
+        constraints.put("unique", uniques);
+        constraints.put("foreignKeys", fks);
+
         root.put("constraints", constraints);
 
-        objectMapper.writeValue(schemaFile.toFile(), root);
+        Path tempFile = tableDir.resolve("schema.json.tmp");
+        objectMapper.writeValue(tempFile.toFile(), root);
+        Files.move(
+                tempFile,
+                schemaFile,
+                StandardCopyOption.ATOMIC_MOVE,
+                StandardCopyOption.REPLACE_EXISTING
+        );
     }
 }

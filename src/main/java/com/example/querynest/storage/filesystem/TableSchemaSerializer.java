@@ -6,5 +6,5 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public interface TableSchemaSerializer {
-    void serialize(CreateTableStatement statement, Path tableDir) throws IOException;
+    void serialize(CreateTableStatement statement, Path tableDir,  String uuid) throws IOException;
 }

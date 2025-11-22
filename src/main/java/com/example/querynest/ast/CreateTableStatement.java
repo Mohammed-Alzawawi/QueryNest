@@ -8,7 +8,8 @@ public record CreateTableStatement(
         String tableName,
         List<ColumnDefinition> columns,
         List<Constraint> constraints,
-        List<String> orderBy
+        List<String> orderBy,
+        String engine
 ) implements Statement {
 
     public CreateTableStatement {

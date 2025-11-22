@@ -44,6 +44,11 @@ public class LexerImpl implements Lexer {
                     position++;
                     continue;
                 }
+                case '=' -> {
+                    tokens.add(new Token(TokenType.EQUAL, "=", position));
+                    position++;
+                    continue;
+                }
             }
 
             if (current == '\'' || current == '"') {

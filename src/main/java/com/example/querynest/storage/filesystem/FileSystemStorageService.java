@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class FileSystemStorageService implements StorageService {
 
     @Override
     public void createTable(CreateTableStatement statement) {
-        String tableName = statement.tableName();
+        String tableName = statement.tableName().toLowerCase();
 
         try {
             if (schemaRegistry.getTable(tableName) != null) {
@@ -39,16 +40,17 @@ public class FileSystemStorageService implements StorageService {
             Path rootDir = Paths.get(basePath).toAbsolutePath().normalize();
             Files.createDirectories(rootDir);
 
-            Path tableDir = rootDir.resolve(tableName.toLowerCase());
+            Path tableDir = rootDir.resolve(tableName);
             if (Files.exists(tableDir)) {
                 throw new StorageException("Table directory already exists on disk: " + tableDir);
             }
 
             Files.createDirectories(tableDir);
 
-            schemaSerializer.serialize(statement, tableDir);
+            String uuid = UUID.randomUUID().toString();
+            schemaSerializer.serialize(statement, tableDir, uuid);
 
-            TableMetadata metadata = toTableMetadata(statement);
+            TableMetadata metadata = toTableMetadata(statement, uuid);
             schemaRegistry.registerTable(metadata);
 
         } catch (IOException e) {
@@ -56,12 +58,17 @@ public class FileSystemStorageService implements StorageService {
         }
     }
 
-    private TableMetadata toTableMetadata(CreateTableStatement statement) {
+    private TableMetadata toTableMetadata(CreateTableStatement statement, String uuid) {
         List<ColumnMetadata> columns = statement.columns().stream()
                 .map(this::toColumnMetadata)
                 .toList();
 
-        return new TableMetadata(statement.tableName(), columns);
+        return new TableMetadata(
+                statement.tableName(),
+                columns,
+                statement.engine(),
+                uuid
+        );
     }
 
     private ColumnMetadata toColumnMetadata(ColumnDefinition col) {
@@ -71,4 +78,23 @@ public class FileSystemStorageService implements StorageService {
                 col.isNullable()
         );
     }
+
+    @Override
+    public List<String> listTables() {
+        return schemaRegistry.getAllTables().stream()
+                .map(TableMetadata::name)
+                .toList();
+    }
+
+    @Override
+    public TableMetadata describeTable(String tableName) {
+        TableMetadata metadata = schemaRegistry.getTable(tableName.toLowerCase());
+
+        if (metadata == null) {
+            throw new StorageException("Table '" + tableName + "' does not exist");
+        }
+
+        return metadata;
+    }
+
 }

@@ -10,7 +10,13 @@ import java.util.Map;
 public class JsonTableSchemaDeserializer {
 
     public static TableMetadata toTableMetadata(Map<String, Object> json) {
-        String tableName = (String) json.get("tableName");
+
+        Map<String, Object> tableBlock =
+                (Map<String, Object>) json.get("table");
+
+        String tableName = (String) tableBlock.get("name");
+        String engine = (String) tableBlock.get("engine");
+        String uuid = (String) tableBlock.get("uuid");
 
         List<Map<String, Object>> cols =
                 (List<Map<String, Object>>) json.get("columns");
@@ -18,13 +24,25 @@ public class JsonTableSchemaDeserializer {
         List<ColumnMetadata> columnMetadata = new ArrayList<>();
 
         for (Map<String, Object> col : cols) {
+
             String name = (String) col.get("name");
-            String dataType = (String) col.get("dataType");
+
+            Map<String, Object> typeMap =
+                    (Map<String, Object>) col.get("type");
+            String dataType = (String) typeMap.get("name");
+
             boolean nullable = (Boolean) col.get("nullable");
 
-            columnMetadata.add(new ColumnMetadata(name, dataType, nullable));
+            columnMetadata.add(
+                    new ColumnMetadata(name, dataType, nullable)
+            );
         }
 
-        return new TableMetadata(tableName, columnMetadata);
+        return new TableMetadata(
+                tableName,
+                columnMetadata,
+                engine,
+                uuid
+        );
     }
 }
