@@ -28,33 +28,58 @@ public class FileSystemStorageService implements StorageService {
     @Value("${querynest.storage.base-path:./data}")
     private String basePath;
 
+    private final Object tableCreationLock = new Object();
+
+    public FileSystemStorageService(SchemaRegistry schemaRegistry,
+                                    TableSchemaSerializer schemaSerializer) {
+        this.schemaRegistry = schemaRegistry;
+        this.schemaSerializer = schemaSerializer;
+    }
+
     @Override
     public void createTable(CreateTableStatement statement) {
         String tableName = statement.tableName().toLowerCase();
+        Path tableDir = null;
+        synchronized (tableCreationLock) {
+            try {
+                if (schemaRegistry.getTable(tableName) != null) {
+                    throw new StorageException("Table '" + tableName + "' is already registered in the schema registry");
+                }
 
-        try {
-            if (schemaRegistry.getTable(tableName) != null) {
-                throw new StorageException("Table '" + tableName + "' is already registered in the schema registry");
+                Path rootDir = Paths.get(basePath).toAbsolutePath().normalize();
+                Files.createDirectories(rootDir);
+
+                tableDir = rootDir.resolve(tableName);
+
+                if (Files.exists(tableDir)) {
+                    throw new StorageException("Table directory already exists on disk: " + tableDir);
+                }
+
+                Files.createDirectories(tableDir);
+
+                String uuid = UUID.randomUUID().toString();
+                schemaSerializer.serialize(statement, tableDir, uuid);
+
+                TableMetadata metadata = toTableMetadata(statement, uuid);
+                schemaRegistry.registerTable(metadata);
+
+            } catch (IOException e) {
+                if (tableDir != null && Files.exists(tableDir)) {
+                    try {
+                        Files.walk(tableDir)
+                                .sorted((a, b) -> b.compareTo(a))
+                                .forEach(path -> {
+                                    try {
+                                        Files.delete(path);
+                                    } catch (IOException ignored) {
+                                    }
+                                });
+                    } catch (IOException ignored) {
+                    }
+                }
+                throw new StorageException("Failed to create table '" + tableName + "'", e);
+
             }
-
-            Path rootDir = Paths.get(basePath).toAbsolutePath().normalize();
-            Files.createDirectories(rootDir);
-
-            Path tableDir = rootDir.resolve(tableName);
-            if (Files.exists(tableDir)) {
-                throw new StorageException("Table directory already exists on disk: " + tableDir);
-            }
-
-            Files.createDirectories(tableDir);
-
-            String uuid = UUID.randomUUID().toString();
-            schemaSerializer.serialize(statement, tableDir, uuid);
-
-            TableMetadata metadata = toTableMetadata(statement, uuid);
-            schemaRegistry.registerTable(metadata);
-
-        } catch (IOException e) {
-            throw new StorageException("Failed to create table '" + tableName + "'", e);
         }
     }
 
@@ -96,5 +121,4 @@ public class FileSystemStorageService implements StorageService {
 
         return metadata;
     }
-
 }
