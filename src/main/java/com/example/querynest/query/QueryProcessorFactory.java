@@ -6,12 +6,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class QueryProcessorFactory {
 
     private final QueryGuesser queryGuesser;
     private final DdlProcessor ddlProcessor;
     private final DmlProcessor dmlProcessor;
+
+    public QueryProcessorFactory(QueryGuesser queryGuesser, DdlProcessor ddlProcessor, DmlProcessor dmlProcessor) {
+        this.queryGuesser = queryGuesser;
+        this.ddlProcessor = ddlProcessor;
+        this.dmlProcessor = dmlProcessor;
+    }
 
     public QueryProcessor getProcessor(String rawQuery) {
         QueryCategory category = queryGuesser.guess(rawQuery);

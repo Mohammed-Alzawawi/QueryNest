@@ -5,11 +5,15 @@ import com.example.querynest.schema.SchemaRegistry;
 import com.example.querynest.validation.ValidationResult;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public class TableNameValidator implements ValidationStrategy {
 
     private final SchemaRegistry registry;
     private final int maxLength;
+
+    public TableNameValidator(SchemaRegistry registry, int maxLength) {
+        this.registry = registry;
+        this.maxLength = maxLength;
+    }
 
     @Override
     public void validate(CreateTableStatement stmt, ValidationResult result) {

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class FileSystemStorageService implements StorageService {
 
     private final SchemaRegistry schemaRegistry;

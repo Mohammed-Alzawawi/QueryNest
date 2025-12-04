@@ -15,11 +15,15 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
-@RequiredArgsConstructor
 public class QueryController {
 
     private final SchemaService schemaService;
     private final QueryProcessorFactory queryProcessorFactory;
+
+    public QueryController(SchemaService schemaService, QueryProcessorFactory queryProcessorFactory) {
+        this.schemaService = schemaService;
+        this.queryProcessorFactory = queryProcessorFactory;
+    }
 
     @PostMapping("/parse")
     public ParseResponse parse(@RequestBody QueryRequest request) {

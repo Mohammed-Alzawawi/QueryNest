@@ -11,10 +11,13 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 public class ConstraintValidator implements ValidationStrategy {
 
     private final SchemaRegistry registry;
+
+    public ConstraintValidator(SchemaRegistry registry) {
+        this.registry = registry;
+    }
 
     @Override
     public void validate(CreateTableStatement stmt, ValidationResult result) {

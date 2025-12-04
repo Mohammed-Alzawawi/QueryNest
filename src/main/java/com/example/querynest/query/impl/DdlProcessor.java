@@ -13,11 +13,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class DdlProcessor extends QueryProcessor {
 
     private final SchemaService schemaService;
     private final SchemaRegistry schemaRegistry;
+
+    public DdlProcessor(SchemaService schemaService, SchemaRegistry schemaRegistry) {
+        this.schemaService = schemaService;
+        this.schemaRegistry = schemaRegistry;
+    }
 
     @Override
     protected Object doProcess(String query) {

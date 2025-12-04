@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class SchemaServiceImpl implements SchemaService {
 
     private final Lexer lexer;
@@ -25,6 +24,17 @@ public class SchemaServiceImpl implements SchemaService {
     private final SchemaValidator schemaValidator;
     private final SqlGenerator sqlGenerator;
     private final StorageService storageService;
+
+
+    public SchemaServiceImpl(Lexer lexer, CreateTableBodyParser createTableBodyParser,
+                             SchemaValidator schemaValidator,
+                             SqlGenerator sqlGenerator, StorageService storageService) {
+        this.lexer = lexer;
+        this.createTableBodyParser = createTableBodyParser;
+        this.schemaValidator = schemaValidator;
+        this.sqlGenerator = sqlGenerator;
+        this.storageService = storageService;
+    }
 
     @Override
     public ValidationResult processCreateStatement(String rawStatement) {
