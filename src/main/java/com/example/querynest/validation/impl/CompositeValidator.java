@@ -24,8 +24,11 @@ public class CompositeValidator implements SchemaValidator {
         this.strategies = List.of(
                 new TableNameValidator(registry, maxTableLength),
                 new ColumnValidator(supportedTypes, maxColumnLength),
-                new ConstraintValidator(registry)
-        );
+                new ConstraintValidator(registry),
+                new EngineValidator(),
+                new OrderByValidator(),
+                new ReservedTableNameValidator()
+                );
     }
 
     @Override

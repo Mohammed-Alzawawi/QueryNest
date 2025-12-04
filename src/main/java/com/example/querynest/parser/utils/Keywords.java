@@ -28,6 +28,7 @@ public final class Keywords {
             Map.entry("DECIMAL", TokenType.DECIMAL),
             Map.entry("TEXT", TokenType.TEXT),
             Map.entry("ORDER", TokenType.ORDER),
-            Map.entry("BY", TokenType.BY)
+            Map.entry("BY", TokenType.BY),
+            Map.entry("ENGINE", TokenType.ENGINE)
     );
 }

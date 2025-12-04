@@ -49,7 +49,19 @@ public class CreateTableBodyParser {
             orderByColumns = parseOrderByColumns(nav);
         }
 
-        return new CreateTableStatement(tableName, columns, constraints, orderByColumns);
+        String engine = "FileSystem";
+        if (nav.match(TokenType.ENGINE)) {
+            nav.consume(TokenType.EQUAL, "Expected '=' after ENGINE");
+            engine = nav.consume(TokenType.IDENTIFIER, "Expected engine name").value();
+        }
+
+        return new CreateTableStatement(
+                tableName,
+                columns,
+                constraints,
+                orderByColumns,
+                engine
+        );
     }
 
     private boolean isConstraint(TokenNavigator nav) {
