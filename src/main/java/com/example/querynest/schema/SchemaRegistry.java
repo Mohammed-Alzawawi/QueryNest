@@ -40,4 +40,7 @@ public class SchemaRegistry {
         tables.clear();
     }
 
+    public void dropTable(String tableName) {
+        tables.remove(tableName.toLowerCase());
+    }
 }

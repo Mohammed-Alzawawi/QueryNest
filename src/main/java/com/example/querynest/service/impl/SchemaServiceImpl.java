@@ -2,6 +2,7 @@ package com.example.querynest.service.impl;
 
 import com.example.querynest.ast.CreateTableStatement;
 import com.example.querynest.builder.SqlGenerator;
+import com.example.querynest.exception.ValidationException;
 import com.example.querynest.parser.lexer.Lexer;
 import com.example.querynest.parser.lexer.Token;
 import com.example.querynest.parser.lexer.TokenNavigator;
