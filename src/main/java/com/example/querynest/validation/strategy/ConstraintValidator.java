@@ -7,7 +7,7 @@ import com.example.querynest.ast.constraints.PrimaryKeyConstraint;
 import com.example.querynest.ast.constraints.UniqueConstraint;
 import com.example.querynest.schema.SchemaRegistry;
 import com.example.querynest.validation.ValidationResult;
-import lombok.RequiredArgsConstructor;
+//import lombok.RequiredArgsConstructor;
 
 import java.util.stream.Collectors;
 

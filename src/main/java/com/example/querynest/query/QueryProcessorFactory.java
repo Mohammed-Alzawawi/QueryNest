@@ -2,7 +2,7 @@ package com.example.querynest.query;
 
 import com.example.querynest.query.impl.DdlProcessor;
 import com.example.querynest.query.impl.DmlProcessor;
-import lombok.RequiredArgsConstructor;
+//import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
