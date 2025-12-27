@@ -3,7 +3,6 @@ package com.example.querynest.validation.strategy;
 import com.example.querynest.ast.CreateTableStatement;
 import com.example.querynest.schema.SchemaRegistry;
 import com.example.querynest.validation.ValidationResult;
-import lombok.RequiredArgsConstructor;
 
 public class TableNameValidator implements ValidationStrategy {
 

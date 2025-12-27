@@ -9,7 +9,6 @@ import com.example.querynest.query.QueryProcessor;
 import com.example.querynest.schema.SchemaRegistry;
 import com.example.querynest.service.SchemaService;
 import com.example.querynest.validation.ValidationResult;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component

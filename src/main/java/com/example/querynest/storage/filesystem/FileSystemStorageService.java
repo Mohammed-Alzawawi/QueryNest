@@ -7,7 +7,6 @@ import com.example.querynest.schema.SchemaRegistry;
 import com.example.querynest.schema.TableMetadata;
 import com.example.querynest.storage.StorageService;
 import com.example.querynest.storage.exception.StorageException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

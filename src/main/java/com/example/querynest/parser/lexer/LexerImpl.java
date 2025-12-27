@@ -49,6 +49,39 @@ public class LexerImpl implements Lexer {
                     position++;
                     continue;
                 }
+                case '*' -> {
+                    tokens.add(new Token(TokenType.STAR, "*", position));
+                    position++;
+                    continue;
+                }
+                case '!' -> {
+                    if (position + 1 < input.length() && input.charAt(position + 1) == '=') {
+                        tokens.add(new Token(TokenType.NOT_EQUAL, "!=", position));
+                        position += 2;
+                        continue;
+                    }
+                }
+                case '<' -> {
+                    if (position + 1 < input.length() && input.charAt(position + 1) == '=') {
+                        tokens.add(new Token(TokenType.LESS_EQUAL, "<=", position));
+                        position += 2;
+                    } else {
+                        tokens.add(new Token(TokenType.LESS, "<", position));
+                        position++;
+                    }
+                    continue;
+                }
+                case '>' -> {
+                    if (position + 1 < input.length() && input.charAt(position + 1) == '=') {
+                        tokens.add(new Token(TokenType.GREATER_EQUAL, ">=", position));
+                        position += 2;
+                    } else {
+                        tokens.add(new Token(TokenType.GREATER, ">", position));
+                        position++;
+                    }
+                    continue;
+                }
+
             }
 
             if (current == '\'' || current == '"') {

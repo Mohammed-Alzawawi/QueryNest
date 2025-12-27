@@ -10,7 +10,6 @@ import com.example.querynest.query.QueryProcessor;
 import com.example.querynest.query.QueryProcessorFactory;
 import com.example.querynest.service.SchemaService;
 import com.example.querynest.validation.ValidationResult;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

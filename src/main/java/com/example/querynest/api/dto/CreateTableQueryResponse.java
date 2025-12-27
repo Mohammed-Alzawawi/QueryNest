@@ -32,3 +32,4 @@ public class CreateTableQueryResponse {
         return warnings;
     }
 }
+
