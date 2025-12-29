@@ -7,7 +7,6 @@ import com.example.querynest.schema.SchemaRegistry;
 import com.example.querynest.schema.TableMetadata;
 import com.example.querynest.storage.StorageService;
 import com.example.querynest.storage.exception.StorageException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,7 @@ public class FileSystemStorageService implements StorageService {
     private final SchemaRegistry schemaRegistry;
     private final TableSchemaSerializer schemaSerializer;
 
-    @Value("${querynest.storage.base-path:./data}")
+    @Value("${database.storage.path}")
     private String basePath;
 
     private final Object tableCreationLock = new Object();
@@ -83,13 +82,13 @@ public class FileSystemStorageService implements StorageService {
     }
 
     private TableMetadata toTableMetadata(CreateTableStatement statement, String uuid) {
-        List<ColumnMetadata> columns = statement.columns().stream()
-                .map(this::toColumnMetadata)
-                .toList();
+        List<ColumnDefinition> columns = statement.columns().stream().toList();
+
 
         return new TableMetadata(
                 statement.tableName(),
                 columns,
+                statement.constraints(),
                 statement.engine(),
                 uuid
         );
@@ -97,8 +96,8 @@ public class FileSystemStorageService implements StorageService {
 
     private ColumnMetadata toColumnMetadata(ColumnDefinition col) {
         return new ColumnMetadata(
-                col.name(),
-                col.dataType(),
+                col.getName(),
+                col.getDataType(),
                 col.isNullable()
         );
     }

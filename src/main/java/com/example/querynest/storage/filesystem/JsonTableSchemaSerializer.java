@@ -44,14 +44,14 @@ public class JsonTableSchemaSerializer implements TableSchemaSerializer {
         List<Map<String, Object>> columns = new ArrayList<>();
         for (ColumnDefinition col : statement.columns()) {
             Map<String, Object> c = new LinkedHashMap<>();
-            c.put("name", col.name());
+            c.put("name", col.getName());
 
             Map<String, Object> typeObj = new LinkedHashMap<>();
-            typeObj.put("name", col.dataType());
+            typeObj.put("name", col.getDataType());
             c.put("type", typeObj);
 
             c.put("nullable", col.isNullable());
-            c.put("default", col.defaultValue());
+            c.put("default", col.getDefaultValue());
 
             columns.add(c);
         }

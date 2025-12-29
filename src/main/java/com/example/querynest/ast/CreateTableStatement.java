@@ -22,5 +22,15 @@ public record CreateTableStatement(
         if (orderBy == null) {
             throw new IllegalArgumentException("orderBy cannot be null");
         }
+    } public List<ColumnDefinition> getColumns() {
+        return columns;
+    }
+
+    public List<Constraint> getConstraints() {
+        return constraints;
+    }
+
+    public String getTableName() {
+        return tableName;
     }
 }

@@ -29,6 +29,9 @@ public final class Keywords {
             Map.entry("TEXT", TokenType.TEXT),
             Map.entry("ORDER", TokenType.ORDER),
             Map.entry("BY", TokenType.BY),
-            Map.entry("ENGINE", TokenType.ENGINE)
+            Map.entry("ENGINE", TokenType.ENGINE),
+            Map.entry("INSERT", TokenType.INSERT),
+            Map.entry("INTO", TokenType.INTO),
+            Map.entry("VALUES", TokenType.VALUES)
     );
 }

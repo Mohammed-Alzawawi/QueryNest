@@ -23,14 +23,14 @@ public class ColumnValidator implements ValidationStrategy {
 
         for (ColumnDefinition col : stmt.columns()) {
 
-            if (!unique.add(col.name().toLowerCase()))
-                result.addError("Duplicate column name: " + col.name());
+            if (!unique.add(col.getName().toLowerCase()))
+                result.addError("Duplicate column name: " + col.getName());
 
-            if (!supportedTypes.contains(col.dataType().toUpperCase()))
-                result.addError("Unsupported type: " + col.dataType());
+            if (!supportedTypes.contains(col.getDataType().toUpperCase()))
+                result.addError("Unsupported type: " + col.getDataType());
 
-            if (col.name().length() > maxLength)
-                result.addError("Column name too long: " + col.name());
+            if (col.getName().length() > maxLength)
+                result.addError("Column name too long: " + col.getName());
         }
     }
 }

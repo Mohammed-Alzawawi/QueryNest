@@ -25,7 +25,7 @@ public class StatementParserTest {
 
         Assertions.assertEquals("users", stmt.tableName());
         Assertions.assertEquals(2, stmt.columns().size());
-        Assertions.assertEquals("ID", stmt.columns().get(0).name().toUpperCase());
-        Assertions.assertEquals("INTEGER", stmt.columns().get(0).dataType().toUpperCase());
+        Assertions.assertEquals("ID", stmt.columns().get(0).getName().toUpperCase());
+        Assertions.assertEquals("INTEGER", stmt.columns().get(0).getDataType().toUpperCase());
     }
 }

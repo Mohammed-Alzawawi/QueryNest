@@ -11,5 +11,8 @@ public enum TokenType {
 
     IDENTIFIER, NUMBER, STRING,
 
-    EOF, UNKNOWN
+    EOF, UNKNOWN,
+    INSERT,
+    INTO,
+    VALUES
 }

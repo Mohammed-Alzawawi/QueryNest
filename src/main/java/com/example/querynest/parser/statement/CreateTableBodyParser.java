@@ -17,42 +17,42 @@ import java.util.List;
 @Component
 public class CreateTableBodyParser {
 
-    public CreateTableStatement parse(TokenNavigator nav) {
+    public CreateTableStatement parse(TokenNavigator navigator) {
 
-        nav.consume(TokenType.CREATE, "Expected CREATE");
-        nav.consume(TokenType.TABLE, "Expected TABLE");
+        navigator.consume(TokenType.CREATE, "Expected CREATE");
+        navigator.consume(TokenType.TABLE, "Expected TABLE");
 
-        String tableName = nav.consume(TokenType.IDENTIFIER, "Expected table name").value();
+        String tableName = navigator.consume(TokenType.IDENTIFIER, "Expected table name").value();
 
-        nav.consume(TokenType.LEFT_PAREN, "Expected '('");
+        navigator.consume(TokenType.LEFT_PAREN, "Expected '('");
 
         List<ColumnDefinition> columns = new ArrayList<>();
         List<Constraint> constraints = new ArrayList<>();
         List<String> orderByColumns = new ArrayList<>();
 
-        while (!nav.check(TokenType.RIGHT_PAREN)) {
-            if (isConstraint(nav)) {
-                constraints.add(parseConstraint(nav));
+        while (!navigator.check(TokenType.RIGHT_PAREN)) {
+            if (isConstraint(navigator)) {
+                constraints.add(parseConstraint(navigator));
             } else {
-                columns.add(parseColumn(nav));
+                columns.add(parseColumn(navigator));
             }
 
-            if (!nav.check(TokenType.RIGHT_PAREN)) {
-                nav.consume(TokenType.COMMA, "Expected comma");
+            if (!navigator.check(TokenType.RIGHT_PAREN)) {
+                navigator.consume(TokenType.COMMA, "Expected comma");
             }
         }
 
-        nav.consume(TokenType.RIGHT_PAREN, "Expected ')'");
+        navigator.consume(TokenType.RIGHT_PAREN, "Expected ')'");
 
-        if (nav.match(TokenType.ORDER)) {
-            nav.consume(TokenType.BY, "Expected BY after ORDER");
-            orderByColumns = parseOrderByColumns(nav);
+        if (navigator.match(TokenType.ORDER)) {
+            navigator.consume(TokenType.BY, "Expected BY after ORDER");
+            orderByColumns = parseOrderByColumns(navigator);
         }
 
         String engine = "FileSystem";
-        if (nav.match(TokenType.ENGINE)) {
-            nav.consume(TokenType.EQUAL, "Expected '=' after ENGINE");
-            engine = nav.consume(TokenType.IDENTIFIER, "Expected engine name").value();
+        if (navigator.match(TokenType.ENGINE)) {
+            navigator.consume(TokenType.EQUAL, "Expected '=' after ENGINE");
+            engine = navigator.consume(TokenType.IDENTIFIER, "Expected engine name").value();
         }
 
         return new CreateTableStatement(
@@ -64,83 +64,83 @@ public class CreateTableBodyParser {
         );
     }
 
-    private boolean isConstraint(TokenNavigator nav) {
-        return nav.check(TokenType.CONSTRAINT)
-                || nav.check(TokenType.PRIMARY)
-                || nav.check(TokenType.FOREIGN)
-                || nav.check(TokenType.UNIQUE);
+    private boolean isConstraint(TokenNavigator navigator) {
+        return navigator.check(TokenType.CONSTRAINT)
+                || navigator.check(TokenType.PRIMARY)
+                || navigator.check(TokenType.FOREIGN)
+                || navigator.check(TokenType.UNIQUE);
     }
 
-    private ColumnDefinition parseColumn(TokenNavigator nav) {
-        String name = nav.consume(TokenType.IDENTIFIER, "Expected column name").value();
-        String dataType = nav.advance().value().toUpperCase();
+    private ColumnDefinition parseColumn(TokenNavigator navigator) {
+        String name = navigator.consume(TokenType.IDENTIFIER, "Expected column name").value();
+        String dataType = navigator.advance().value().toUpperCase();
 
         boolean isNullable = true;
         String defaultValue = null;
 
-        if (nav.check(TokenType.LEFT_PAREN)) {
-            nav.advance();
-            nav.consume(TokenType.NUMBER, "Expected size");
-            nav.consume(TokenType.RIGHT_PAREN, "Expected ')'");
+        if (navigator.check(TokenType.LEFT_PAREN)) {
+            navigator.advance();
+            navigator.consume(TokenType.NUMBER, "Expected size");
+            navigator.consume(TokenType.RIGHT_PAREN, "Expected ')'");
         }
 
-        if (nav.match(TokenType.NOT)) {
-            nav.consume(TokenType.NULL, "Expected NULL after NOT");
+        if (navigator.match(TokenType.NOT)) {
+            navigator.consume(TokenType.NULL, "Expected NULL after NOT");
             isNullable = false;
         }
 
-        if (nav.match(TokenType.DEFAULT)) {
-            defaultValue = nav.advance().value();
+        if (navigator.match(TokenType.DEFAULT)) {
+            defaultValue = navigator.advance().value();
         }
 
         return new ColumnDefinition(name, dataType, isNullable, defaultValue);
     }
 
-    private Constraint parseConstraint(TokenNavigator nav) {
+    private Constraint parseConstraint(TokenNavigator navigator) {
         String name = null;
 
-        if (nav.match(TokenType.CONSTRAINT)) {
-            name = nav.consume(TokenType.IDENTIFIER, "Expected constraint name").value();
+        if (navigator.match(TokenType.CONSTRAINT)) {
+            name = navigator.consume(TokenType.IDENTIFIER, "Expected constraint name").value();
         }
 
-        if (nav.match(TokenType.PRIMARY)) {
-            nav.consume(TokenType.KEY, "Expected KEY");
-            return new PrimaryKeyConstraint(name, parseColumnList(nav));
+        if (navigator.match(TokenType.PRIMARY)) {
+            navigator.consume(TokenType.KEY, "Expected KEY");
+            return new PrimaryKeyConstraint(name, parseColumnList(navigator));
         }
 
-        if (nav.match(TokenType.FOREIGN)) {
-            nav.consume(TokenType.KEY, "Expected KEY");
-            List<String> cols = parseColumnList(nav);
-            nav.consume(TokenType.REFERENCES, "Expected REFERENCES");
-            String refTable = nav.consume(TokenType.IDENTIFIER, "Expected table name").value();
-            List<String> refCols = parseColumnList(nav);
+        if (navigator.match(TokenType.FOREIGN)) {
+            navigator.consume(TokenType.KEY, "Expected KEY");
+            List<String> cols = parseColumnList(navigator);
+            navigator.consume(TokenType.REFERENCES, "Expected REFERENCES");
+            String refTable = navigator.consume(TokenType.IDENTIFIER, "Expected table name").value();
+            List<String> refCols = parseColumnList(navigator);
             return new ForeignKeyConstraint(name, cols, refTable, refCols);
         }
 
-        if (nav.match(TokenType.UNIQUE)) {
-            return new UniqueConstraint(name, parseColumnList(nav));
+        if (navigator.match(TokenType.UNIQUE)) {
+            return new UniqueConstraint(name, parseColumnList(navigator));
         }
 
         throw new ParseException("Unknown constraint");
     }
 
-    private List<String> parseColumnList(TokenNavigator nav) {
-        nav.consume(TokenType.LEFT_PAREN, "Expected '('");
+    private List<String> parseColumnList(TokenNavigator navigator) {
+        navigator.consume(TokenType.LEFT_PAREN, "Expected '('");
 
         List<String> cols = new ArrayList<>();
         do {
-            cols.add(nav.consume(TokenType.IDENTIFIER, "Expected column").value());
-        } while (nav.match(TokenType.COMMA));
+            cols.add(navigator.consume(TokenType.IDENTIFIER, "Expected column").value());
+        } while (navigator.match(TokenType.COMMA));
 
-        nav.consume(TokenType.RIGHT_PAREN, "Expected ')'");
+        navigator.consume(TokenType.RIGHT_PAREN, "Expected ')'");
 
         return cols;
     }
-    private List<String> parseOrderByColumns(TokenNavigator nav) {
+    private List<String> parseOrderByColumns(TokenNavigator navigator) {
         List<String> cols = new ArrayList<>();
         do {
-            cols.add(nav.consume(TokenType.IDENTIFIER, "Expected column name in ORDER BY").value());
-        } while (nav.match(TokenType.COMMA));
+            cols.add(navigator.consume(TokenType.IDENTIFIER, "Expected column name in ORDER BY").value());
+        } while (navigator.match(TokenType.COMMA));
         return cols;
     }
 }

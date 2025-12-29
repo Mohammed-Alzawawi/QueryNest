@@ -25,7 +25,7 @@ public class SchemaRegistry {
         if (table == null) return false;
 
         return table.columns().stream()
-                .anyMatch(col -> col.name().equalsIgnoreCase(columnName));
+                .anyMatch(col -> col.getName().equalsIgnoreCase(columnName));
     }
 
     public TableMetadata getTable(String tableName) {

@@ -8,9 +8,9 @@ import java.util.List;
 public interface StorageService {
 
     void createTable(CreateTableStatement statement);
-
     List<String> listTables();
-
     TableMetadata describeTable(String tableName);
+//    CreateTableStatement getTableSchema(String tableName);
+
 }
 

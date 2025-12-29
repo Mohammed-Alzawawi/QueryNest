@@ -1,34 +1,44 @@
 package com.example.querynest.schema;
 
+import com.example.querynest.ast.ColumnDefinition;
+import com.example.querynest.ast.constraints.Constraint;
+
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 public record TableMetadata(
         String name,
-        List<ColumnMetadata>columns,
+        List<ColumnDefinition>columns,
+        List<Constraint> constraints,
         String engine,
         String uuid
 ) {
 
     public boolean hasColumn(String columnName) {
         return columns.stream()
-                .anyMatch(c -> c.name().equalsIgnoreCase(columnName));
+                .anyMatch(c -> c.getName().equalsIgnoreCase(columnName));
     }
 
-    public ColumnMetadata getColumn(String columnName) {
+    public ColumnDefinition getColumn(String columnName) {
         return columns.stream()
-                .filter(c -> c.name().equalsIgnoreCase(columnName))
+                .filter(c -> c.getName().equalsIgnoreCase(columnName))
                 .findFirst()
                 .orElse(null);
     }
 
     public List<String> columnNames() {
         return columns.stream()
-                .map(ColumnMetadata::name)
+                .map(ColumnDefinition::getName)
                 .toList();
     }
 
+    public List<Constraint> getConstraints() {
+        return constraints;
+    }
+
     public boolean isNullable(String columnName) {
-        ColumnMetadata col = getColumn(columnName);
+        ColumnDefinition col = getColumn(columnName);
         return col != null && col.isNullable();
     }
 

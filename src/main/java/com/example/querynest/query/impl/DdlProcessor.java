@@ -9,7 +9,6 @@ import com.example.querynest.query.QueryProcessor;
 import com.example.querynest.schema.SchemaRegistry;
 import com.example.querynest.service.SchemaService;
 import com.example.querynest.validation.ValidationResult;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,7 +28,7 @@ public class DdlProcessor extends QueryProcessor {
         String upper = query.toUpperCase();
 
         if (upper.startsWith("CREATE")) {
-            CreateTableStatement ast = schemaService.parseStatement(query);
+            CreateTableStatement ast = schemaService.parseCreateStatement(query);
             ValidationResult vr = schemaService.processCreateStatement(query);
 
             return new CreateTableQueryResponse(

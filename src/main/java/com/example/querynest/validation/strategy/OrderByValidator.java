@@ -18,7 +18,7 @@ public class OrderByValidator implements ValidationStrategy {
 
         Set<String> columnNames = new HashSet<>(
                 stmt.columns().stream()
-                        .map(c -> c.name().toLowerCase())
+                        .map(c -> c.getName().toLowerCase())
                         .toList()
         );
 

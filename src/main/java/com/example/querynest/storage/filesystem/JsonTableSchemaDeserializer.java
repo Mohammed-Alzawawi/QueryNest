@@ -1,5 +1,7 @@
 package com.example.querynest.storage.filesystem;
 
+import com.example.querynest.ast.ColumnDefinition;
+import com.example.querynest.ast.constraints.Constraint;
 import com.example.querynest.schema.ColumnMetadata;
 import com.example.querynest.schema.TableMetadata;
 
@@ -20,8 +22,10 @@ public class JsonTableSchemaDeserializer {
 
         List<Map<String, Object>> cols =
                 (List<Map<String, Object>>) json.get("columns");
+        List<Constraint> cons =
+                (List<Constraint>) json.get("constraints");
 
-        List<ColumnMetadata> columnMetadata = new ArrayList<>();
+        List<ColumnDefinition> columnMetadata = new ArrayList<>();
 
         for (Map<String, Object> col : cols) {
 
@@ -34,13 +38,14 @@ public class JsonTableSchemaDeserializer {
             boolean nullable = (Boolean) col.get("nullable");
 
             columnMetadata.add(
-                    new ColumnMetadata(name, dataType, nullable)
+                    new ColumnDefinition(name, dataType, nullable)
             );
         }
 
         return new TableMetadata(
                 tableName,
                 columnMetadata,
+                cons,
                 engine,
                 uuid
         );

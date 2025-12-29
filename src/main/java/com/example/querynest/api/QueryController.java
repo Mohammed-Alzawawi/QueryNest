@@ -1,17 +1,17 @@
 package com.example.querynest.api;
 
-import com.example.querynest.api.dto.ErrorResponse;
-import com.example.querynest.api.dto.ParseResponse;
-import com.example.querynest.api.dto.QueryRequest;
-import com.example.querynest.api.dto.ValidationResponse;
+import com.example.querynest.api.dto.*;
 import com.example.querynest.ast.CreateTableStatement;
 import com.example.querynest.exception.ValidationException;
 import com.example.querynest.query.QueryProcessor;
 import com.example.querynest.query.QueryProcessorFactory;
 import com.example.querynest.service.SchemaService;
 import com.example.querynest.validation.ValidationResult;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -27,14 +27,14 @@ public class QueryController {
 
     @PostMapping("/parse")
     public ParseResponse parse(@RequestBody QueryRequest request) {
-        CreateTableStatement ast = schemaService.parseStatement(request.getQuery());
+        CreateTableStatement ast = schemaService.parseCreateStatement(request.getQuery());
         return new ParseResponse("success", ast);
     }
 
     @PostMapping("/validate")
     public Object validate(@RequestBody QueryRequest request) {
         try {
-            CreateTableStatement ast = schemaService.parseStatement(request.getQuery());
+            CreateTableStatement ast = schemaService.parseCreateStatement(request.getQuery());
             ValidationResult vr = schemaService.processCreateStatement(request.getQuery());
             return new ValidationResponse("success", vr.getWarnings());
         } catch (ValidationException ve) {
@@ -54,5 +54,10 @@ public class QueryController {
         } catch (UnsupportedOperationException uoe) {
             return new ErrorResponse(uoe.getMessage());
         }
+    }
+
+    @PostMapping("/insert")
+    public ValidationResult insertData(@RequestBody InsertRequest request) {
+        return schemaService.processInsertStatement(request.getQuery());
     }
 }

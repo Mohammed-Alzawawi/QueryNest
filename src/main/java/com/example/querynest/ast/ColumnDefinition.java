@@ -1,21 +1,36 @@
 package com.example.querynest.ast;
 
-public record ColumnDefinition(
-        String name,
-        String dataType,
-        boolean isNullable,
-        String defaultValue
-) {
-    public ColumnDefinition {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Column name cannot be null or empty");
-        }
-        if (dataType == null || dataType.isBlank()) {
-            throw new IllegalArgumentException("Data type cannot be null or empty");
-        }
+public class ColumnDefinition {
+    private final String name;
+    private final String dataType;
+    private final boolean nullable;
+    private final String defaultValue;
+
+    public ColumnDefinition(String name, String dataType, boolean nullable) {
+        this(name, dataType, nullable, null);
     }
 
-    public ColumnDefinition(String name, String dataType, boolean isNullable) {
-        this(name, dataType, isNullable, null);
+    public ColumnDefinition(String name, String dataType, boolean nullable,
+                            String defaultValue) {
+        this.name = name;
+        this.dataType = dataType;
+        this.nullable = nullable;
+        this.defaultValue = defaultValue;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDataType() {
+        return dataType;
+    }
+
+    public boolean isNullable() {
+        return nullable;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
     }
 }
