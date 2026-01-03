@@ -9,9 +9,11 @@ import java.util.Objects;
 public final class MergeExecutor {
 
     private final MergeLogger logger;
+    private final MergeWriter mergeWriter;
 
-    public MergeExecutor(MergeLogger logger) {
+    public MergeExecutor(MergeLogger logger, MergeWriter mergeWriter) {
         this.logger = Objects.requireNonNull(logger, "logger");
+        this.mergeWriter = Objects.requireNonNull(mergeWriter, "mergeWriter");
     }
 
     public void execute(List<PartHandle> parts) {
@@ -22,47 +24,50 @@ public final class MergeExecutor {
         logger.log(new MergeEvent(
                 MergeEvent.Type.STARTED,
                 parts.stream().map(PartHandle::getPart).toList(),
-                "merge attempt started",
+                "merge started",
                 null
         ));
 
         try {
-            for (PartHandle handle : parts) {
-                if (!handle.tryMarkMerging()) {
+            for (PartHandle h : parts) {
+                if (!h.tryMarkMerging()) {
                     for (PartHandle l : locked) {
                         l.releaseMerging();
                     }
-
                     logger.log(new MergeEvent(
                             MergeEvent.Type.SKIPPED,
-                            List.of(handle.getPart()),
-                            "merge skipped: part already merging or not active",
+                            List.of(h.getPart()),
+                            "merge skipped: part not active",
                             null
                     ));
                     return;
                 }
-                locked.add(handle);
+                locked.add(h);
             }
 
             logger.log(new MergeEvent(
                     MergeEvent.Type.PLANNED,
                     parts.stream().map(PartHandle::getPart).toList(),
-                    "merge locks acquired successfully (planning complete)",
+                    "merge locks acquired",
                     null
             ));
+
+            mergeWriter.merge(parts.stream().map(PartHandle::getPart).toList());
+
+            for (PartHandle h : parts) {
+                h.markObsolete();
+            }
 
             logger.log(new MergeEvent(
                     MergeEvent.Type.COMPLETED,
                     parts.stream().map(PartHandle::getPart).toList(),
-                    "merge completed (no-op executor for now)",
+                    "merge completed",
                     null
             ));
-
         } catch (Exception e) {
             for (PartHandle l : locked) {
                 l.releaseMerging();
             }
-
             logger.log(new MergeEvent(
                     MergeEvent.Type.FAILED,
                     parts.stream().map(PartHandle::getPart).toList(),

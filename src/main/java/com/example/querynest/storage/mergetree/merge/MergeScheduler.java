@@ -47,7 +47,6 @@ public final class MergeScheduler implements Runnable {
 
     public void start() {
         if (running) return;
-
         running = true;
         thread = new Thread(this, "merge-scheduler");
         thread.setDaemon(true);
@@ -87,7 +86,6 @@ public final class MergeScheduler implements Runnable {
                 executor.execute(handles);
 
                 Thread.sleep(MergeTreeConfig.MERGE_INTERVAL_MS);
-
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 running = false;
@@ -96,7 +94,7 @@ public final class MergeScheduler implements Runnable {
                 logger.log(new MergeEvent(
                         MergeEvent.Type.FAILED,
                         null,
-                        "merge scheduler loop failed",
+                        "merge scheduler error",
                         e
                 ));
                 try {

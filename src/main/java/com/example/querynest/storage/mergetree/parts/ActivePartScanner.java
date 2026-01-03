@@ -46,7 +46,6 @@ public final class ActivePartScanner {
                     validator.validate(part);
                     result.add(part);
                 } catch (IllegalStateException e) {
-                    // invalid or incomplete part → ignore
                 }
             }
         }
